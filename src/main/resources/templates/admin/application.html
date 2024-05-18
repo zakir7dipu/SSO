@@ -5,6 +5,22 @@
       layout:decorate="~{layouts/admin_layout}">
 <head>
     <title>Application</title>
+    <style>
+        .fixed-bottom-right {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1030; /* Higher than the default Bootstrap z-index to ensure it's on top */
+            font-size: 36px;
+            /*line-height: unset;*/
+            border-radius: 50%;
+            padding: 3px 8px;
+        }
+
+        .fixed-bottom-right > i {
+            transform: translate(0%, 10%);
+        }
+    </style>
 </head>
 <body>
 <main layout:fragment="dash_content">
@@ -21,8 +37,96 @@
                 </li>
             </ul>
         </div>
+        <div class="right">
+            <div class="col-sm-12">
+                <div>
+
+                    <!-- Check for login error -->
+
+                    <div th:if="${errorMassage != null}">
+
+                        <div class="alert alert-danger col-xs-offset-1 col-xs-10" th:text="${errorMassage}">
+                        </div>
+
+                    </div>
+                    <!-- Check for successful Registration -->
+
+                    <div th:if="${successMessage != null}">
+
+                        <div class="alert alert-success col-xs-offset-1 col-xs-10" th:text="${successMessage}"></div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
     </div>
 
+    <div class="col-12 table-responsive">
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>SL</th>
+                <th>App Name</th>
+                <th>Access Keys</th>
+                <th>Action</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="item, iterStat: ${apps}">
+                <td th:text="${iterStat.index + 1}"></td>
+                <td th:text="${item.app_name}"></td>
+                <td>
+                    <p th:text="${item.access_key}"></p>
+                    <p th:text="${item.secrete_access_key}"></p>
+                </td>
+                <td></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+
+    <div class="col-sm-12">
+        <button type="button" class="btn btn-primary fixed-bottom-right" data-bs-toggle="modal"
+                data-bs-target="#appCreateModal">
+            <i class='bx bx-plus'></i>
+        </button>
+    </div>
+
+    <div class="modal" id="appCreateModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add New App</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form th:action="@{/application}" method="post" th:object="${app}">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="appName" class="form-label">App Name</label>
+                            <input type="text" class="form-control" id="appName" placeholder="App Name" name="app_name"
+                                   th:field="*{app_name}" autofocus required="required"/>
+                        </div>
+                        <div class="mb-3">
+                            <label for="domainAuthenticationUrl" class="form-label">Login Url</label>
+                            <input type="url" class="form-control" id="domainAuthenticationUrl" placeholder="Login Url"
+                                   name="domain_authentication_url" th:field="*{domain_authentication_url}" required="required"/>
+                        </div>
+                        <div class="mb-3">
+                            <label for="redirectUrl" class="form-label">Redirect to Url</label>
+                            <input type="url" class="form-control" id="redirectUrl" placeholder="Redirect to Url"
+                                   name="redirect_url" th:field="*{redirect_url}" required="required"/>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </main>
 
 </body>

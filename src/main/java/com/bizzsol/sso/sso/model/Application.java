@@ -7,14 +7,14 @@ import java.time.LocalDateTime;
 
 @Data
 @Entity
-@Table
+@Table(name = "application")
 public class Application {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     @Column(name = "app_name", nullable = false, unique = true)
     private String app_name;
-    @Column(name = "domain_url", nullable = false, unique = true)
+    @Column(name = "domain_authentication_url", nullable = false, unique = true)
     private String domain_authentication_url;
     @Column(name = "redirect_url", nullable = false, unique = true)
     private String redirect_url;
