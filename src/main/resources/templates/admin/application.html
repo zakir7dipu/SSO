@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/admin_layout}">
+<head>
+    <title>Application</title>
+</head>
+<body>
+<main layout:fragment="dash_content">
+    <div class="head-title">
+        <div class="left">
+            <h1>Application</h1>
+            <ul class="breadcrumb">
+                <li>
+                    <a th:href="@{/}">Dashboard</a>
+                </li>
+                <li><i class='bx bx-chevron-right'></i></li>
+                <li>
+                    <a class="active" href="#">Application</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+</main>
+
+</body>
+</html>

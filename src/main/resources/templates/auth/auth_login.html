@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/auth_layout}">
+<head>
+    <title>Login</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <section class="sign-in">
+        <div class="container">
+            <div class="signin-content">
+                <div class="signin-image">
+                    <figure><img th:src="@{/images/login/signin-image.jpg}" src="" alt="sing up image"/></figure>
+                    <a th:href="@{/register}" class="signup-image-link">Create an account</a>
+                </div>
+
+                <div class="signin-form">
+                    <h2 class="form-title">Sign up</h2>
+                    <form action="#" th:action="@{/authenticateTheUser}"
+                          method="POST" class="register-form" id="register-form">
+                        <div class="form-group">
+                            <div class="col-xs-15">
+                                <div>
+
+                                    <!-- Check for login error -->
+
+                                    <div th:if="${param.error}">
+
+                                        <div class="alert alert-danger col-xs-offset-1 col-xs-10">
+                                            Invalid username and password.
+                                        </div>
+
+                                    </div>
+
+                                    <!-- Check for logout -->
+
+                                    <div th:if="${param.logout}">
+
+                                        <div class="alert alert-success col-xs-offset-1 col-xs-10">
+                                            You have been logged out.
+                                        </div>
+
+                                    </div>
+
+                                    <!-- Check for successful Registration -->
+
+                                    <div th:if="${successMessage != null}">
+
+                                        <div class="alert alert-success col-xs-offset-1 col-xs-10" th:text="${successMessage}"></div>
+
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <!--                            <label for="phone">Phone Number</label>-->
+                            <input type="text" name="username" autofocus placeholder="username" class="form-control"/>
+                        </div>
+
+                        <div class="form-group">
+                            <!--                            <label for="password">Password</label>-->
+                            <input type="password" name="password" placeholder="Password" class="form-control"/>
+                        </div>
+                        <div class="form-group form-button">
+                            <input type="submit" name="signin" id="signin" class="form-submit"
+                                   value="Log in"/>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+</body>
+</html>
