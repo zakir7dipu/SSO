@@ -17,8 +17,8 @@ public class ApplicationService {
     private ApplicationRepository applicationRepository;
     public Application save(Application application) {
         LocalDateTime nowTime = LocalDateTime.now();
-        String accessKey = UUID.randomUUID().toString().replace("-", "").substring(0, 10);
-        String secreteAccessKey = UUID.randomUUID().toString().replace("-", "").substring(0, 16);
+        String accessKey = UUID.randomUUID().toString().replace("-", "").substring(0, 20);
+        String secreteAccessKey = UUID.randomUUID().toString().replace("-", "").substring(0, 32);
 
         application.setCreated_at(nowTime);
         application.setUpdated_at(nowTime);

@@ -38,27 +38,8 @@
             </ul>
         </div>
         <div class="right">
-            <div class="col-sm-12">
-                <div>
-
-                    <!-- Check for login error -->
-
-                    <div th:if="${errorMassage != null}">
-
-                        <div class="alert alert-danger col-xs-offset-1 col-xs-10" th:text="${errorMassage}">
-                        </div>
-
-                    </div>
-                    <!-- Check for successful Registration -->
-
-                    <div th:if="${successMessage != null}">
-
-                        <div class="alert alert-success col-xs-offset-1 col-xs-10" th:text="${successMessage}"></div>
-
-                    </div>
-
-                </div>
-            </div>
+            <p th:if="${errorMassage != null}" class="d-none has-error" th:text="${errorMassage}"></p>
+            <p th:if="${successMessage != null}" class="d-none has-success" th:text="${successMessage}"></p>
         </div>
     </div>
 
@@ -77,10 +58,30 @@
                 <td th:text="${iterStat.index + 1}"></td>
                 <td th:text="${item.app_name}"></td>
                 <td>
-                    <p th:text="${item.access_key}"></p>
-                    <p th:text="${item.secrete_access_key}"></p>
+                    <div class="input-group">
+                        <input id="accessKey" type="text" class="form-control" th:value="${item.access_key}" readonly/>
+                        <button class="btn btn-light-primary copy-to-clipboard">
+                            <i class='bx bx-copy'></i>
+                        </button>
+                    </div>
+                    <div class="input-group">
+                        <input id="secreteAccessKey" type="text" class="form-control"
+                               th:value="${item.secrete_access_key}" readonly/>
+                        <button class="btn btn-light-primary copy-to-clipboard">
+                            <i class='bx bx-copy'></i>
+                        </button>
+                    </div>
                 </td>
-                <td></td>
+                <td>
+                    <div class="input-group">
+                        <button class="btn btn-light-primary edit-btn fs-5" th:data-id="${item.id}" data-action="/show">
+                            <i class='bx bxs-message-alt-edit text-primary'></i>
+                        </button>
+                        <button class="btn btn-light-primary delete-btn fs-5" th:data-id="${item.id}" >
+                            <i class='bx bxs-message-alt-x text-danger'></i>
+                        </button>
+                    </div>
+                </td>
             </tr>
             </tbody>
         </table>
@@ -111,7 +112,8 @@
                         <div class="mb-3">
                             <label for="domainAuthenticationUrl" class="form-label">Login Url</label>
                             <input type="url" class="form-control" id="domainAuthenticationUrl" placeholder="Login Url"
-                                   name="domain_authentication_url" th:field="*{domain_authentication_url}" required="required"/>
+                                   name="domain_authentication_url" th:field="*{domain_authentication_url}"
+                                   required="required"/>
                         </div>
                         <div class="mb-3">
                             <label for="redirectUrl" class="form-label">Redirect to Url</label>
@@ -128,6 +130,11 @@
         </div>
     </div>
 </main>
+
+
+<script>
+
+</script>
 
 </body>
 </html>

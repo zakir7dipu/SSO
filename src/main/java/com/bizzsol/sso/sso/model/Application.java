@@ -1,6 +1,7 @@
 package com.bizzsol.sso.sso.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -12,10 +13,13 @@ public class Application {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+    @NotBlank(message = "App Name is mandatory")
     @Column(name = "app_name", nullable = false, unique = true)
     private String app_name;
+    @NotBlank(message = "Login Url is mandatory")
     @Column(name = "domain_authentication_url", nullable = false, unique = true)
     private String domain_authentication_url;
+    @NotBlank(message = "Redirect to Url is mandatory")
     @Column(name = "redirect_url", nullable = false, unique = true)
     private String redirect_url;
     @Column(name = "access_key", nullable = false, unique = true)
