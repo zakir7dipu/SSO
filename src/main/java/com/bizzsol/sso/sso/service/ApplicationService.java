@@ -47,7 +47,6 @@ public class ApplicationService {
         LocalDateTime nowTime = LocalDateTime.now();
 
         Application oldApplication = this.findById(id).orElse(null);
-        System.out.println(oldApplication);
         if(oldApplication != null) {
             oldApplication.setAppName(updatedApplication.getAppName() != null && !updatedApplication.getAppName().equals("") ? updatedApplication.getAppName():oldApplication.getAppName());
 

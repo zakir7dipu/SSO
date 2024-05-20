@@ -40,11 +40,5 @@ public class RegisterController {
         } catch (Exception exception) {
             return "auth/register"; // Retain errors in the form
         }
-        // Implement user registration logic (validation, saving to database, etc.)
-//        if (result.hasErrors()) {
-//
-//        }
-
-
     }
 }

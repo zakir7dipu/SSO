@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/admin_layout}">
+<head>
+    <title>Application</title>
+    <style>
+        .fixed-bottom-right {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1030; /* Higher than the default Bootstrap z-index to ensure it's on top */
+            font-size: 36px;
+            /*line-height: unset;*/
+            border-radius: 50%;
+            padding: 3px 8px;
+        }
+
+        .fixed-bottom-right > i {
+            transform: translate(0%, 10%);
+        }
+    </style>
+</head>
+<body>
+<main layout:fragment="dash_content">
+    <div class="head-title">
+        <div class="left">
+            <h1>Users</h1>
+            <ul class="breadcrumb">
+                <li>
+                    <a th:href="@{/}">Dashboard</a>
+                </li>
+                <li><i class='bx bx-chevron-right'></i></li>
+                <li>
+                    <a class="active" href="#">Users</a>
+                </li>
+            </ul>
+        </div>
+        <div class="right">
+            <p th:if="${errorMassage != null}" class="d-none has-error" th:text="${errorMassage}"></p>
+            <p th:if="${successMessage != null}" class="d-none has-success" th:text="${successMessage}"></p>
+        </div>
+    </div>
+
+    <div class="col-12 table-responsive">
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>SL</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Action</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="item, iterStat: ${users}">
+                <td th:text="${iterStat.index + 1}"></td>
+                <td th:text="${item.userName}"></td>
+                <td th:text="${item.email}"></td>
+                <td th:text="${item.phone}"></td>
+                <td>
+                    <div class="input-group">
+                        <button class="btn btn-light-primary edit-btn fs-5" th:data-name="${item.userName}"
+                                data-action="/user/show">
+                            <i class='bx bxs-message-alt-edit text-primary'></i>
+                        </button>
+                        <button class="btn btn-light-primary delete-btn fs-5" th:data-name="${item.userName}">
+                            <i class='bx bxs-message-alt-x text-danger'></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+
+    <div class="col-sm-12">
+        <button type="button" class="btn btn-primary fixed-bottom-right" id="userNewAppBtn">
+            <i class='bx bx-plus'></i>
+        </button>
+    </div>
+
+    <div class="modal" id="userCreateModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add New App</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form th:action="@{/user}" method="post" th:object="${user}">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="userName" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="userName" placeholder="Username" name="username"
+                                   th:field="*{userName}" required="required"/>
+                        </div>
+                        <div class="mb-3">
+                            <label for="userEmail" class="form-label">User Email</label>
+                            <input type="email" class="form-control" id="userEmail" placeholder="User Email"
+                                   name="email" th:field="*{email}"
+                                   required="required"/>
+                        </div>
+                        <div class="mb-3">
+                            <label for="userPhone" class="form-label">User Phone</label>
+                            <input type="tel" class="form-control" id="userPhone" placeholder="User Phone"
+                                   name="phone" th:field="*{phone}" required="required"/>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</main>
+
+
+<th:block layout:fragment="script">
+    <script>
+        // add new form and modal show
+        document.querySelector("#userNewAppBtn").addEventListener("click", () => {
+            const userCreateModal = new bootstrap.Modal(document.querySelector("#userCreateModal"), {
+                keyboard: false
+            })
+            // document.querySelector("#userCreateModal").querySelector("#appName").value = "";
+            // document.querySelector("#userCreateModal").querySelector("#domainAuthenticationUrl").value = "";
+            // document.querySelector("#userCreateModal").querySelector("#redirectUrl").value = "";
+            // document.querySelector("#userCreateModal").querySelector("form").action = `/application`;
+            userCreateModal.show()
+        })
+
+        // edit form and modal show
+        Array.from(document.querySelectorAll(".edit-btn")).map(item => {
+            item.addEventListener("click", () => {
+                const {name, action} = item.dataset;
+                const url = `${action}?username=${name}`
+                // const url = window.location.href + `${action}?name=${name}`
+                axios.get(url)
+                    .then(response => {
+                        const {data, status} = response;
+                        const userCreateModal = new bootstrap.Modal(document.querySelector("#userCreateModal"), {
+                            keyboard: false
+                        })
+                        const {username, email, phone} = data;
+                        document.querySelector("#userCreateModal").querySelector("#userName").value = username;
+                        document.querySelector("#userCreateModal").querySelector("#userName").setAttribute("readonly", "readonly");
+                        document.querySelector("#userCreateModal").querySelector("#userEmail").value = email;
+                        document.querySelector("#userCreateModal").querySelector("#userPhone").value = phone;
+                        document.querySelector("#userCreateModal").querySelector("form").action = `/user/update?username=${username}`;
+                        userCreateModal.show()
+                    })
+                    .catch(error => {
+                        if (error.response) toastr.error(error.message);
+                        else toastr.error(error.message);
+                    });
+                ;
+            })
+        })
+
+        // delete modal show
+
+        Array.from(document.querySelectorAll(".delete-btn")).map(item=>{
+            item.addEventListener("click", () => {
+                const {id} = item.dataset;
+                const url = "/application/delete" + `?id=${id}`
+                console.log(url)
+                axios.get(url)
+                    .then(response => {
+                        window.location.reload()
+                    })
+                    .catch(error => {
+                        if (error.response) toastr.error(error.message);
+                        else toastr.error(error.message);
+                    });
+            })
+        })
+    </script>
+</th:block>
+</body>
+</html>

@@ -52,7 +52,7 @@ public class ApplicationController {
     }
 
     @PostMapping("/update")
-    public String updateApp(@Valid @ModelAttribute @RequestParam Long id, Application application, BindingResult result, Model model, RedirectAttributes redirectAttributes) {
+    public String update(@Valid @ModelAttribute @RequestParam Long id, Application application, BindingResult result, Model model, RedirectAttributes redirectAttributes) {
 
         try {
             applicationService.update(id, application);

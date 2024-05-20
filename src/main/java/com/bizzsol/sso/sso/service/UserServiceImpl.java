@@ -10,14 +10,13 @@ import com.bizzsol.sso.sso.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -75,5 +74,54 @@ public class UserServiceImpl implements UserService {
         user.setRoles(roles);
 
         return userRepository.save(user);
+    }
+
+    public User genUserSave(User user) {
+        LocalDateTime nowTime = LocalDateTime.now();
+        user.setCreated_at(nowTime);
+        user.setUpdated_at(nowTime);
+
+        // Assuming rolesService.findRoleByName() returns a single Role object
+        Role adminRole = rolesService.findRoleByName("ROLE_User");
+
+        // Create a set to hold roles
+        Set<Role> roles = new HashSet<>();
+        roles.add(adminRole);
+
+        // Set the roles to the user
+        user.setRoles(roles);
+
+        return userRepository.save(user);
+    }
+
+    public User genUserUpdate(String username, User updatedUser) {
+        LocalDateTime nowTime = LocalDateTime.now();
+        User oldUser = this.findUserByUserName(username).orElse(null);
+        if(oldUser != null) {
+            oldUser.setEmail(updatedUser.getEmail() != null && !updatedUser.getEmail().equals("") ? updatedUser.getEmail() : oldUser.getEmail());
+
+            oldUser.setPhone(updatedUser.getPhone() != null && !updatedUser.getPhone().equals("") ? updatedUser.getPhone() : oldUser.getPhone());
+
+            oldUser.setUpdated_at(nowTime);
+        }
+        return userRepository.save(oldUser);
+    }
+
+    public List<User> findUsersExcludingCurrentAndAdmins() {
+        String currentUsername = getCurrentUsername();
+        return userRepository.findUsersExcludingCurrentAndAdmins(currentUsername);
+    }
+
+    private String getCurrentUsername() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (principal instanceof UserDetails) {
+            return ((UserDetails) principal).getUsername();
+        } else {
+            return principal.toString();
+        }
+    }
+
+    public Optional<User> findUserByUserName(String userName) {
+        return userRepository.findUserByUserName(userName);
     }
 }
