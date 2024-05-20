@@ -56,7 +56,7 @@
             <tbody>
             <tr th:each="item, iterStat: ${apps}">
                 <td th:text="${iterStat.index + 1}"></td>
-                <td th:text="${item.app_name}"></td>
+                <td th:text="${item.appName}"></td>
                 <td>
                     <div class="input-group">
                         <input id="accessKey" type="text" class="form-control" th:value="${item.access_key}" readonly/>
@@ -74,10 +74,11 @@
                 </td>
                 <td>
                     <div class="input-group">
-                        <button class="btn btn-light-primary edit-btn fs-5" th:data-id="${item.id}" data-action="/show">
+                        <button class="btn btn-light-primary edit-btn fs-5" th:data-name="${item.appName}"
+                                data-action="/show">
                             <i class='bx bxs-message-alt-edit text-primary'></i>
                         </button>
-                        <button class="btn btn-light-primary delete-btn fs-5" th:data-id="${item.id}" >
+                        <button class="btn btn-light-primary delete-btn fs-5" th:data-id="${item.id}">
                             <i class='bx bxs-message-alt-x text-danger'></i>
                         </button>
                     </div>
@@ -89,8 +90,7 @@
 
 
     <div class="col-sm-12">
-        <button type="button" class="btn btn-primary fixed-bottom-right" data-bs-toggle="modal"
-                data-bs-target="#appCreateModal">
+        <button type="button" class="btn btn-primary fixed-bottom-right" id="addNewAppBtn">
             <i class='bx bx-plus'></i>
         </button>
     </div>
@@ -107,7 +107,7 @@
                         <div class="mb-3">
                             <label for="appName" class="form-label">App Name</label>
                             <input type="text" class="form-control" id="appName" placeholder="App Name" name="app_name"
-                                   th:field="*{app_name}" autofocus required="required"/>
+                                   th:field="*{appName}" autofocus required="required"/>
                         </div>
                         <div class="mb-3">
                             <label for="domainAuthenticationUrl" class="form-label">Login Url</label>
@@ -132,9 +132,67 @@
 </main>
 
 
-<script>
+<th:block layout:fragment="script">
+    <script>
+        // clipboard
+        Array.from(document.querySelectorAll(".copy-to-clipboard")).map(item => item.addEventListener("click", () => navigator.clipboard.writeText(item.parentElement.querySelector('input').value)))
 
-</script>
+        // add new form and modal show
+        document.querySelector("#addNewAppBtn").addEventListener("click", () => {
+            const appCreateModal = new bootstrap.Modal(document.querySelector("#appCreateModal"), {
+                keyboard: false
+            })
+            document.querySelector("#appCreateModal").querySelector("#appName").value = "";
+            document.querySelector("#appCreateModal").querySelector("#domainAuthenticationUrl").value = "";
+            document.querySelector("#appCreateModal").querySelector("#redirectUrl").value = "";
+            document.querySelector("#appCreateModal").querySelector("form").action = `/application`;
+            appCreateModal.show()
+        })
 
+        // edit form and modal show
+        Array.from(document.querySelectorAll(".edit-btn")).map(item => {
+            item.addEventListener("click", () => {
+                const {name, action} = item.dataset;
+                const url = "/application" + `${action}?name=${name}`
+                // const url = window.location.href + `${action}?name=${name}`
+                axios.get(url)
+                    .then(response => {
+                        const {data, status} = response;
+                        const appCreateModal = new bootstrap.Modal(document.querySelector("#appCreateModal"), {
+                            keyboard: false
+                        })
+                        document.querySelector("#appCreateModal").querySelector("#appName").value = data.appName;
+                        document.querySelector("#appCreateModal").querySelector("#domainAuthenticationUrl").value = data.domain_authentication_url;
+                        document.querySelector("#appCreateModal").querySelector("#redirectUrl").value = data.redirect_url;
+                        document.querySelector("#appCreateModal").querySelector("form").action = `/application/update?id=${data.id}`;
+                        appCreateModal.show()
+                    })
+                    .catch(error => {
+                        if (error.response) toastr.error(error.message);
+                        else toastr.error(error.message);
+                    });
+                ;
+            })
+        })
+
+        // delete modal show
+
+        Array.from(document.querySelectorAll(".delete-btn")).map(item=>{
+            item.addEventListener("click", () => {
+                const {id} = item.dataset;
+                const url = "/application/delete" + `?id=${id}`
+                console.log(url)
+                axios.get(url)
+                    .then(response => {
+                        window.location.reload()
+                    })
+                    .catch(error => {
+                        if (error.response) toastr.error(error.message);
+                        else toastr.error(error.message);
+                    });
+            })
+        })
+    </script>
+</th:block>
 </body>
 </html>

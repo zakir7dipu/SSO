@@ -15,7 +15,7 @@ public class Application {
     private long id;
     @NotBlank(message = "App Name is mandatory")
     @Column(name = "app_name", nullable = false, unique = true)
-    private String app_name;
+    private String appName;
     @NotBlank(message = "Login Url is mandatory")
     @Column(name = "domain_authentication_url", nullable = false, unique = true)
     private String domain_authentication_url;

@@ -2,6 +2,7 @@ package com.bizzsol.sso.sso.service;
 
 import com.bizzsol.sso.sso.model.Application;
 import com.bizzsol.sso.sso.repository.ApplicationRepository;
+import jakarta.persistence.EntityManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +16,9 @@ public class ApplicationService {
 
     @Autowired
     private ApplicationRepository applicationRepository;
+
+    private EntityManager entityManager;
+
     public Application save(Application application) {
         LocalDateTime nowTime = LocalDateTime.now();
         String accessKey = UUID.randomUUID().toString().replace("-", "").substring(0, 20);
@@ -35,12 +39,17 @@ public class ApplicationService {
         return applicationRepository.findById(id);
     }
 
+    public Optional<Application> findByAppName(String appName) {
+        return applicationRepository.findByAppName(appName);
+    }
+
     public Application update(Long id, Application updatedApplication) {
         LocalDateTime nowTime = LocalDateTime.now();
 
         Application oldApplication = this.findById(id).orElse(null);
+        System.out.println(oldApplication);
         if(oldApplication != null) {
-            oldApplication.setApp_name(updatedApplication.getApp_name() != null && !updatedApplication.getApp_name().equals("") ? updatedApplication.getApp_name():oldApplication.getApp_name());
+            oldApplication.setAppName(updatedApplication.getAppName() != null && !updatedApplication.getAppName().equals("") ? updatedApplication.getAppName():oldApplication.getAppName());
 
             oldApplication.setDomain_authentication_url(updatedApplication.getDomain_authentication_url() != null && !updatedApplication.getDomain_authentication_url().equals("") ? updatedApplication.getDomain_authentication_url() : oldApplication.getDomain_authentication_url());
 
