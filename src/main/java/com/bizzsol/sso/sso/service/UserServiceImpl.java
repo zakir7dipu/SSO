@@ -4,9 +4,12 @@ import com.bizzsol.sso.sso.dao.RoleDao;
 import com.bizzsol.sso.sso.dao.RoleDaoImpl;
 import com.bizzsol.sso.sso.dao.UserDao;
 import com.bizzsol.sso.sso.dao.UserDaoImpl;
+import com.bizzsol.sso.sso.model.Application;
 import com.bizzsol.sso.sso.model.Role;
 import com.bizzsol.sso.sso.model.User;
+import com.bizzsol.sso.sso.repository.ApplicationRepository;
 import com.bizzsol.sso.sso.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -90,7 +93,6 @@ public class UserServiceImpl implements UserService {
 
         // Set the roles to the user
         user.setRoles(roles);
-
         return userRepository.save(user);
     }
 
@@ -124,4 +126,39 @@ public class UserServiceImpl implements UserService {
     public Optional<User> findUserByUserName(String userName) {
         return userRepository.findUserByUserName(userName);
     }
+
+    public void deleteUserByID(Long id) {
+        userRepository.deleteById(id);
+    }
+
+    @Autowired
+    private ApplicationRepository applicationRepository;
+    public Set<Long> getApplicationIdsForUser(Long userId) {
+        Optional<User> userOpt = userRepository.findById(userId);
+
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            return user.getApplications().stream()
+                    .map(Application::getId)
+                    .collect(Collectors.toSet());
+        }
+
+        throw new RuntimeException("User not found");
+    }
+
+    @Transactional
+    public User syncUserApplications(Long userId, List<Long> applicationIds) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        Set<Application> newApplications = new HashSet<>(applicationRepository.findAllById(applicationIds));
+
+        // Remove roles not in the newRoles set
+//        user.getApplications().removeIf(application -> !newApplications.contains(application));
+        user.getApplications().removeAll(user.getApplications());
+
+        // Add new roles
+        user.getApplications().addAll(newApplications);
+
+        return userRepository.save(user);
+    }
+
 }

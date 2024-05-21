@@ -51,6 +51,7 @@
                 <th>Username</th>
                 <th>Email</th>
                 <th>Phone</th>
+                <th>Access App</th>
                 <th>Action</th>
             </tr>
             </thead>
@@ -60,6 +61,11 @@
                 <td th:text="${item.userName}"></td>
                 <td th:text="${item.email}"></td>
                 <td th:text="${item.phone}"></td>
+                <td>
+                    <p th:each="app:${item.applications}">
+                        <span class="badge bg-secondary" th:text="${app.appName}"></span>
+                    </p>
+                </td>
                 <td>
                     <div class="input-group">
                         <button class="btn btn-light-primary edit-btn fs-5" th:data-name="${item.userName}"
@@ -108,6 +114,16 @@
                             <input type="tel" class="form-control" id="userPhone" placeholder="User Phone"
                                    name="phone" th:field="*{phone}" required="required"/>
                         </div>
+                        <div class="mb-3">
+                            <label for="accessApp" class="form-label">Apps</label>
+                            <select id="accessApp" class="accessAppInput form-control" multiple="multiple"
+                                    th:field="*{applications}"
+                                    name="applications[]" style="width: 100%" required="required">
+                                <span th:each="app : ${apps}">
+                                    <option th:value="${app.id}" th:text="${app.appName}"></option>
+                                </span>
+                            </select>
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -127,10 +143,16 @@
             const userCreateModal = new bootstrap.Modal(document.querySelector("#userCreateModal"), {
                 keyboard: false
             })
-            // document.querySelector("#userCreateModal").querySelector("#appName").value = "";
-            // document.querySelector("#userCreateModal").querySelector("#domainAuthenticationUrl").value = "";
-            // document.querySelector("#userCreateModal").querySelector("#redirectUrl").value = "";
-            // document.querySelector("#userCreateModal").querySelector("form").action = `/application`;
+            document.querySelector("#userCreateModal").querySelector("#userName").value = "";
+            document.querySelector("#userCreateModal").querySelector("#userName").removeAttribute("readonly");
+            document.querySelector("#userCreateModal").querySelector("#userEmail").value = "";
+            document.querySelector("#userCreateModal").querySelector("#userPhone").value = "";
+            document.querySelector("#userCreateModal").querySelector("form").action = `/user`;
+            $(".accessAppInput").each(function () {
+                $(this).select2({
+                    dropdownParent: $(this).parent()
+                });
+            });
             userCreateModal.show()
         })
 
@@ -146,12 +168,17 @@
                         const userCreateModal = new bootstrap.Modal(document.querySelector("#userCreateModal"), {
                             keyboard: false
                         })
-                        const {username, email, phone} = data;
-                        document.querySelector("#userCreateModal").querySelector("#userName").value = username;
+                        const {userName, email, phone} = data;
+                        document.querySelector("#userCreateModal").querySelector("#userName").value = userName;
                         document.querySelector("#userCreateModal").querySelector("#userName").setAttribute("readonly", "readonly");
                         document.querySelector("#userCreateModal").querySelector("#userEmail").value = email;
                         document.querySelector("#userCreateModal").querySelector("#userPhone").value = phone;
-                        document.querySelector("#userCreateModal").querySelector("form").action = `/user/update?username=${username}`;
+                        document.querySelector("#userCreateModal").querySelector("form").action = `/user/update?username=${userName}`;
+                        $(".accessAppInput").each(function () {
+                            $(this).select2({
+                                dropdownParent: $(this).parent()
+                            });
+                        });
                         userCreateModal.show()
                     })
                     .catch(error => {
@@ -163,12 +190,10 @@
         })
 
         // delete modal show
-
-        Array.from(document.querySelectorAll(".delete-btn")).map(item=>{
+        Array.from(document.querySelectorAll(".delete-btn")).map(item => {
             item.addEventListener("click", () => {
-                const {id} = item.dataset;
-                const url = "/application/delete" + `?id=${id}`
-                console.log(url)
+                const {name} = item.dataset;
+                const url = `/user/delete?username=${name}`;
                 axios.get(url)
                     .then(response => {
                         window.location.reload()
