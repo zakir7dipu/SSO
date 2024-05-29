@@ -30,7 +30,7 @@ public class SecurityConfig {
         http.authorizeHttpRequests(configurer -> configurer
                                 .requestMatchers(
                                         "/login",
-//                                        "/sso",
+                                        "/register",
                                         "/images/**",
                                         "/css/**",
                                         "/js/**",

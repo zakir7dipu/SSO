@@ -20,6 +20,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Controller
 public class UserController {
@@ -51,9 +52,8 @@ public class UserController {
         try {
             String pwd = "123@456";
             user.setPassword(passwordEncoder.encode(pwd));
-            List apps = (List) user.getApplications();
-            User newUser = userService.genUserSave(user);
-            userService.syncUserApplications(newUser.getId(), apps);
+            User newUser = userService.createNewUserSave(user);
+            newUser.setApplications(user.getApplications());
             redirectAttributes.addFlashAttribute("successMessage", "User created successful!\nThe password is " + pwd);
         } catch (Exception exception) {
             redirectAttributes.addFlashAttribute("errorMassage", exception.getMessage());
@@ -61,12 +61,13 @@ public class UserController {
         return "redirect:/user";
     }
 
+
     @GetMapping("/user/show")
     public ResponseEntity<?> show(@RequestParam String username) {
         try {
-            Optional<User> user = userService.findUserByUserName(username);
-            return user.map(ResponseEntity::ok)
-                    .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+            User user = userService.findUserByUserName(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+            System.out.println(user.getApplications());
+            return ResponseEntity.ok(user);
         } catch (Exception exception) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }

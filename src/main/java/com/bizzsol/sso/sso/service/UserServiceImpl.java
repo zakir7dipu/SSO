@@ -93,6 +93,26 @@ public class UserServiceImpl implements UserService {
 
         // Set the roles to the user
         user.setRoles(roles);
+
+        System.out.println(user);
+        return userRepository.save(user);
+    }
+
+    public User createNewUserSave(User user) {
+        LocalDateTime nowTime = LocalDateTime.now();
+        user.setCreated_at(nowTime);
+        user.setUpdated_at(nowTime);
+
+        // Assuming rolesService.findRoleByName() returns a single Role object
+        Role adminRole = rolesService.findRoleByName("ROLE_USER");
+
+        // Create a set to hold roles
+        Set<Role> roles = new HashSet<>();
+        roles.add(adminRole);
+
+        // Set the roles to the user
+        user.setRoles(roles);
+
         return userRepository.save(user);
     }
 

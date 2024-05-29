@@ -5,6 +5,8 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @Entity
@@ -30,4 +32,7 @@ public class Application {
     private LocalDateTime created_at;
     @Column(name = "updated_at")
     private LocalDateTime updated_at;
+
+    @ManyToMany(mappedBy = "applications", fetch = FetchType.LAZY)
+    private Set<User> users;
 }
